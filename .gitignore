@@ -1,0 +1,136 @@
+# ==============================================================================
+# KRISHISETU - SECURE & CROSS-PLATFORM (MAC + WINDOWS) .GITIGNORE
+# ==============================================================================
+
+# ==============================
+# 1. SECURITY & SENSITIVE DATA
+# ==============================
+# Environment variables & secrets (NEVER commit real credentials)
+.env
+.env.*
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Always keep template examples tracked so teammates know what variables to configure
+!.env.example
+!.env.*.example
+
+# Private keys, certificates, and SSL files
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+
+# Cloud / Service Account credentials and tokens
+credentials.json
+client_secret*.json
+service-account*.json
+token.json
+tokens.json
+
+# Local database files & dumps
+*.sqlite
+*.sqlite3
+*.db
+dump/
+
+# Runtime uploads and user-submitted attachments
+uploads/
+storage/
+attachments/
+
+# ==============================
+# 2. NODE.JS / JAVASCRIPT
+# ==============================
+# CRITICAL: Node modules are platform-specific (compiled for macOS vs Windows)
+# Teammates MUST run 'npm install' locally on their own OS.
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json.bak
+
+# Build outputs & frontend caches
+dist/
+build/
+.vite/
+coverage/
+.cache/
+
+# ==============================
+# 3. PYTHON / AI SERVICE
+# ==============================
+# CRITICAL: Python virtualenvs contain OS-specific binaries and absolute paths.
+# Teammates MUST create their own venv on Windows (python -m venv venv).
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Trained AI model weights and binary artifacts
+*.joblib
+*.pkl
+*.h5
+*.keras
+*.pt
+*.pth
+*.onnx
+ai-service/saved_models/*
+!ai-service/saved_models/.gitkeep
+
+# ==============================
+# 4. LOGS
+# ==============================
+*.log
+logs/
+
+# ==============================
+# 5. OS-SPECIFIC JUNK FILES
+# ==============================
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+__MACOSX/
+
+# Windows system files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ==============================
+# 6. IDES AND EDITORS
+# ==============================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Temporary editor swap files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~

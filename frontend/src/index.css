@@ -1,0 +1,187 @@
+/* ===== KrishiSetu Design System =====
+   Green / white / earth tones with subtle yellow-orange accents,
+   as specified for an agriculture-focused, trustworthy government-style UI. */
+:root {
+  --green-900: #14432a;
+  --green-700: #1f6b3f;
+  --green-600: #278c4f;
+  --green-500: #34a853;
+  --green-100: #e6f4ea;
+  --earth-700: #6b4a2f;
+  --earth-300: #d9c2a3;
+  --sand-50: #faf7f0;
+  --accent-orange: #f2994a;
+  --accent-yellow: #f2c94c;
+  --gray-900: #1c1f1a;
+  --gray-600: #5c6660;
+  --gray-300: #d9ded9;
+  --gray-100: #f4f6f3;
+  --white: #ffffff;
+  --danger: #d64545;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 2px 10px rgba(20, 67, 42, 0.08);
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--gray-100);
+  color: var(--gray-900);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+img { max-width: 100%; display: block; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 22px; border-radius: var(--radius-md); border: none;
+  font-weight: 600; font-size: 15px; transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--green-600); color: var(--white); }
+.btn-primary:hover { background: var(--green-700); }
+.btn-secondary { background: var(--white); color: var(--green-700); border: 1.5px solid var(--green-600); }
+.btn-secondary:hover { background: var(--green-100); }
+.btn-accent { background: var(--accent-orange); color: var(--white); }
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-block { width: 100%; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Cards */
+.card {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card); padding: 20px;
+}
+.card-hover { transition: transform .15s ease, box-shadow .15s ease; }
+.card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(20,67,42,.12); }
+
+/* Badges */
+.badge {
+  display: inline-block; padding: 4px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; letter-spacing: .2px;
+}
+.badge-green { background: var(--green-100); color: var(--green-700); }
+.badge-orange { background: #fdeedb; color: #b5651d; }
+.badge-red { background: #fbe4e4; color: var(--danger); }
+.badge-gray { background: var(--gray-100); color: var(--gray-600); }
+
+/* Layout helpers */
+.grid { display: grid; gap: 20px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+.flex { display: flex; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-8 { gap: 8px; } .gap-12 { gap: 12px; } .gap-16 { gap: 16px; } .gap-24 { gap: 24px; }
+
+/* Forms */
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: var(--gray-900); }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 11px 14px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--gray-300); font-size: 14px; background: var(--white);
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none; border-color: var(--green-600); box-shadow: 0 0 0 3px var(--green-100);
+}
+
+/* Navbar */
+.navbar {
+  background: var(--white); border-bottom: 1px solid var(--gray-300);
+  position: sticky; top: 0; z-index: 50;
+}
+.navbar-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; max-width: 1200px; margin: 0 auto; }
+.logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 20px; color: var(--green-700); }
+.logo-mark { width: 34px; height: 34px; border-radius: 8px; background: var(--green-600); color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.nav-links { display: flex; gap: 22px; align-items: center; font-weight: 500; font-size: 14px; color: var(--gray-600); }
+.nav-links a:hover { color: var(--green-700); }
+.nav-toggle {
+  display: none; background: none; border: none; font-size: 22px; line-height: 1;
+  padding: 6px 8px; color: var(--gray-900); border-radius: var(--radius-md);
+}
+.nav-toggle:active { background: var(--gray-100); }
+
+/* Below ~760px the nav links overflow the header, so collapse them behind a
+   hamburger toggle instead of letting them wrap or clip on small Android/phone
+   screens. */
+@media (max-width: 760px) {
+  .nav-toggle { display: inline-flex; align-items: center; justify-content: center; }
+  .nav-links {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 4px;
+    background: var(--white); border-bottom: 1px solid var(--gray-300);
+    padding: 12px 20px 18px; box-shadow: 0 8px 16px rgba(20,67,42,.08);
+  }
+  .nav-links-open { display: flex; }
+  .nav-links a, .nav-links button { padding: 10px 4px; }
+}
+.navbar-inner { position: relative; }
+
+/* Two-column layouts used on data-heavy pages (auction room, gate entry
+   form) stack into a single column on phones instead of squeezing two
+   panels into ~360px of width. */
+.grid-cols-2-responsive { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 760px) { .grid-cols-2-responsive { grid-template-columns: 1fr; } }
+.grid-cols-wide-responsive { grid-template-columns: 1.4fr 1fr; }
+@media (max-width: 760px) { .grid-cols-wide-responsive { grid-template-columns: 1fr; } }
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 55%, var(--green-600) 100%);
+  color: white; padding: 80px 20px; text-align: center; position: relative; overflow: hidden;
+}
+.hero h1 { font-size: 42px; margin: 0 0 16px; max-width: 800px; margin-inline: auto; line-height: 1.2; }
+.hero p { font-size: 18px; opacity: .92; max-width: 640px; margin: 0 auto 32px; }
+.hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* Status badges by lifecycle */
+.status-active { color: var(--green-700); }
+.status-closed { color: var(--gray-600); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 12px; font-size: 14px; border-bottom: 1px solid var(--gray-300); }
+th { color: var(--gray-600); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* Dashboard shell */
+.dash-shell { display: flex; min-height: calc(100vh - 65px); }
+.dash-sidebar { width: 230px; background: var(--white); border-right: 1px solid var(--gray-300); padding: 20px 12px; flex-shrink: 0; }
+.dash-sidebar a { display: block; padding: 10px 14px; border-radius: var(--radius-md); color: var(--gray-600); font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.dash-sidebar a.active, .dash-sidebar a:hover { background: var(--green-100); color: var(--green-700); }
+.dash-main { flex: 1; padding: 28px; max-width: 1100px; }
+@media (max-width: 850px) { .dash-shell { flex-direction: column; } .dash-sidebar { width: 100%; display: flex; overflow-x: auto; } .dash-sidebar a { white-space: nowrap; } }
+
+.stat-card { display: flex; flex-direction: column; gap: 6px; }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--green-800, var(--green-700)); }
+.stat-label { font-size: 13px; color: var(--gray-600); font-weight: 600; }
+
+.muted { color: var(--gray-600); }
+.section-title { font-size: 20px; font-weight: 800; margin: 32px 0 16px; color: var(--gray-900); }
+
+/* Shipment / logistics tracker */
+.tracker-progress { position: relative; height: 6px; background: var(--gray-300); border-radius: 999px; margin: 18px 0 10px; }
+.tracker-progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--green-600); border-radius: 999px; transition: width .3s ease; }
+.tracker-waypoints { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-600); font-weight: 600; }
+.tracker-waypoints .reached { color: var(--green-700); }
+.tracker-history { margin-top: 16px; border-left: 2px solid var(--gray-300); padding-left: 16px; }
+.tracker-history-item { position: relative; padding-bottom: 14px; font-size: 13px; }
+.tracker-history-item::before { content: ''; position: absolute; left: -20.5px; top: 3px; width: 9px; height: 9px; border-radius: 50%; background: var(--green-600); }
+.tracker-history-item:last-child { padding-bottom: 0; }
+.tracker-history-time { color: var(--gray-600); font-size: 11px; }
+
+/* Payment gateway (mock) checkout */
+.gateway-box { border: 1.5px dashed var(--green-600); border-radius: var(--radius-md); padding: 18px; background: var(--green-100); text-align: center; }
+.gateway-box .muted { margin-bottom: 14px; }
