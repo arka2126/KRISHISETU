@@ -4,6 +4,7 @@ import time
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 from app.data.adapters import get_market_adapter, list_known_commodities, list_known_markets
 from app.models import price_predictor
@@ -38,13 +39,29 @@ app = FastAPI(
     version="1.0.0",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[os.getenv("NODE_BACKEND_URL", "http://localhost:5000")],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+allowed_origins_raw = os.getenv("ALLOWED_ORIGINS") or os.getenv("NODE_BACKEND_URL")
+if allowed_origins_raw and allowed_origins_raw != "*":
+    origins = [orig.strip() for orig in allowed_origins_raw.split(",") if orig.strip()]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
 
 
 def _handle(fn, *args, **kwargs):

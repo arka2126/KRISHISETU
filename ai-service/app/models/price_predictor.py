@@ -152,8 +152,8 @@ def predict_price(commodity: str, market: str, horizon_days: int = 1) -> dict:
     point_pred = float(model.predict(x)[0])
 
     # Uncertainty: std across individual trees (RandomForest) or across a bootstrap
-    # of the leaves (fallback for XGBoost: use residual RMSE from training metrics).
-    if hasattr(model, "estimators_"):
+    # of the leaves (fallback for XGBoost / GradientBoosting: use residual RMSE from training metrics).
+    if isinstance(model, RandomForestRegressor) and hasattr(model, "estimators_"):
         x_values = x.values
         tree_preds = np.array([est.predict(x_values)[0] for est in model.estimators_])
         std = float(tree_preds.std())

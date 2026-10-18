@@ -25,7 +25,7 @@ def test_train_then_predict():
     r = client.post("/api/v1/train", json={"commodity": COMMODITY, "market": MARKET, "history_days": 365})
     assert r.status_code == 200, r.text
     body = r.json()
-    assert body["chosen_model"] in ("random_forest", "xgboost")
+    assert body["chosen_model"] in ("random_forest", "xgboost", "gradient_boosting")
     assert body["metrics"][body["chosen_model"]]["mape"] < 100  # sanity: model isn't nonsense
 
     r2 = client.post("/api/v1/predict-price", json={"commodity": COMMODITY, "market": MARKET, "horizon_days": 1})
