@@ -52,6 +52,18 @@ export default function AIMarketIntelligence() {
     }
   }, [commodity, market, horizon, serviceStatus.online]);
 
+  useEffect(() => {
+    if (serviceStatus.online) {
+      if (
+        (activeTab === 'comparison' && !comparison) ||
+        (activeTab === 'recommendations' && !recommendations) ||
+        (activeTab === 'forecast' && !forecast)
+      ) {
+        fetchAIData();
+      }
+    }
+  }, [activeTab]);
+
   const fetchAIData = async () => {
     setLoading(true);
     setError(null);
@@ -187,10 +199,15 @@ export default function AIMarketIntelligence() {
 
           <div className="flex" style={{ alignItems: 'center', gap: 10 }}>
             {serviceStatus.online ? (
-              <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px' }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#278c4f' }}></span>
-                AI Service Online (:8001)
-              </span>
+              <>
+                <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#278c4f' }}></span>
+                  AI Service Online (:8001)
+                </span>
+                <button className="btn btn-secondary btn-sm" onClick={fetchAIData} disabled={loading}>
+                  {loading ? '⏳ Loading…' : '🔄 Refresh Data'}
+                </button>
+              </>
             ) : (
               <button className="btn btn-secondary btn-sm" onClick={checkHealth}>
                 🔄 Check AI Service Status
@@ -479,7 +496,10 @@ export default function AIMarketIntelligence() {
               {(!comparison || !comparison.markets) && (
                 <tr>
                   <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 24 }}>
-                    Start the AI service to view real-time inter-mandi price spreads.
+                    <p style={{ margin: '0 0 10px 0' }}>No comparison data loaded yet for {commodity}.</p>
+                    <button className="btn btn-secondary btn-sm" onClick={fetchAIData} disabled={loading}>
+                      {loading ? '⏳ Loading…' : '🔄 Load Inter-Mandi Spreads'}
+                    </button>
                   </td>
                 </tr>
               )}
