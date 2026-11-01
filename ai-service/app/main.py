@@ -189,7 +189,11 @@ def market_insights(req: MarketInsightsRequest):
         try:
             prediction = price_predictor.predict_price(req.commodity, req.market, 1)
         except FileNotFoundError:
-            prediction = {"error": "Model not trained yet. Call /api/v1/train first."}
+            try:
+                price_predictor.train_price_model(raw_df, req.commodity, req.market)
+                prediction = price_predictor.predict_price(req.commodity, req.market, 1)
+            except Exception:
+                prediction = {"error": "Model not trained yet. Call /api/v1/train first."}
 
         return {
             "commodity": req.commodity,
