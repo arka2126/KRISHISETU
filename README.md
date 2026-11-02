@@ -52,10 +52,10 @@ flowchart TD
         FastAPI --> MandiComp
     end
 
-    UI <-->|HTTP / REST| API
-    UI <-->|WebSockets (Bid Stream)| Socket
+    UI <-->|HTTP and REST| API
+    UI <-->|WebSocket Bid Stream| Socket
     API <-->|Mongoose ODM| Mongo
-    API <-->|Internal Microservice HTTP| FastAPI
+    API <-->|Internal HTTP Client| FastAPI
 ```
 
 ---
