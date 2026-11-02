@@ -91,7 +91,7 @@ flowchart TD
 | **Database** | MongoDB Atlas, Mongoose ODM |
 | **AI / ML Service** | Python 3.11, FastAPI, Uvicorn, Scikit-Learn, XGBoost, Pandas, NumPy, Statsmodels |
 | **Authentication** | JWT (JSON Web Tokens), Bcrypt.js password hashing, Role-Based Access Control |
-| **Hosting & Cloud** | Vercel / Netlify (Frontend), Render (Node Backend & Python AI), MongoDB Atlas |
+| **Hosting & Cloud** | Vercel (Frontend), Render (Node Backend & Python AI), MongoDB Atlas |
 
 ---
 
@@ -289,7 +289,7 @@ KrishiSetu is designed with a modern decoupled cloud architecture:
 
 ```
 ┌─────────────────────────┐
-│     Vercel              │ ◄── React 18 SPA (Fast Global Edge CDN)
+│         Vercel              │ ◄── React 18 SPA (Fast Global Edge CDN)
 └───────────┬─────────────┘
             │ HTTPS / WSS
             ▼
@@ -300,14 +300,14 @@ KrishiSetu is designed with a modern decoupled cloud architecture:
             │ Internal REST
             ▼
 ┌─────────────────────────┐
-│  Hugging Face / Render  │ ◄── Python FastAPI AI Microservice
+│          Render         │ ◄── Python FastAPI AI Microservice
 │  FastAPI + Scikit/XGB   │     (2 vCPU / 16 GB RAM)
 └─────────────────────────┘
 ```
 
 ### Environment Variable Reference
 
-#### Frontend (`Vercel / Netlify`)
+#### Frontend (`Vercel`)
 ```env
 VITE_API_URL=https://krishisetu-on9g.onrender.com/api
 VITE_SOCKET_URL=https://krishisetu-on9g.onrender.com
@@ -323,7 +323,7 @@ CLIENT_URL=https://krishisetu-nine.vercel.app
 AI_SERVICE_URL=https://krishisetu-ai-mbap.onrender.com
 ```
 
-#### AI Microservice (`Render / Hugging Face Spaces`)
+#### AI Microservice (`Render`)
 ```env
 PORT=7860
 ALLOWED_ORIGINS=https://krishisetu-nine.vercel.app,https://krishisetu-on9g.onrender.com
