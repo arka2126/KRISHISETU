@@ -18,6 +18,8 @@ export default function AIMarketIntelligence() {
 
   // Service status
   const [serviceStatus, setServiceStatus] = useState({ checked: false, online: false, info: null });
+  const [wakingUp, setWakingUp] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -29,19 +31,28 @@ export default function AIMarketIntelligence() {
 
   // Check health on mount
   useEffect(() => {
-    checkHealth();
+    checkHealth(4);
   }, []);
 
-  const checkHealth = async () => {
+  const checkHealth = async (retriesLeft = 4) => {
     try {
       const res = await api.get('/ai/health');
       if (res.data?.success && res.data?.data) {
         setServiceStatus({ checked: true, online: true, info: res.data.data });
+        setWakingUp(false);
+        setRetryCount(0);
+        return;
+      }
+      throw new Error('Not ready');
+    } catch (err) {
+      if (retriesLeft > 0) {
+        setWakingUp(true);
+        setRetryCount(5 - retriesLeft);
+        setTimeout(() => checkHealth(retriesLeft - 1), 5000);
       } else {
+        setWakingUp(false);
         setServiceStatus({ checked: true, online: false, info: null });
       }
-    } catch (err) {
-      setServiceStatus({ checked: true, online: false, info: null });
     }
   };
 
@@ -51,6 +62,18 @@ export default function AIMarketIntelligence() {
       fetchAIData();
     }
   }, [commodity, market, horizon, serviceStatus.online]);
+
+  useEffect(() => {
+    if (serviceStatus.online) {
+      if (
+        (activeTab === 'comparison' && !comparison) ||
+        (activeTab === 'recommendations' && !recommendations) ||
+        (activeTab === 'forecast' && !forecast)
+      ) {
+        fetchAIData();
+      }
+    }
+  }, [activeTab]);
 
   const fetchAIData = async () => {
     setLoading(true);
@@ -187,31 +210,47 @@ export default function AIMarketIntelligence() {
 
           <div className="flex" style={{ alignItems: 'center', gap: 10 }}>
             {serviceStatus.online ? (
-              <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px' }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#278c4f' }}></span>
-                AI Service Online (:8001)
-              </span>
+              <>
+                <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#278c4f' }}></span>
+                  AI Service Online (:8001)
+                </span>
+                <button className="btn btn-secondary btn-sm" onClick={fetchAIData} disabled={loading}>
+                  {loading ? '⏳ Loading…' : '🔄 Refresh Data'}
+                </button>
+              </>
             ) : (
-              <button className="btn btn-secondary btn-sm" onClick={checkHealth}>
-                🔄 Check AI Service Status
+              <button className="btn btn-secondary btn-sm" onClick={() => checkHealth(4)} disabled={wakingUp}>
+                {wakingUp ? '⏳ Connecting…' : '🔄 Check AI Service Status'}
               </button>
             )}
           </div>
         </div>
 
-        {/* Offline Helper Guide */}
-        {serviceStatus.checked && !serviceStatus.online && (
+        {/* Waking Up from Sleep Banner (Auto-retrying) */}
+        {wakingUp && !serviceStatus.online && (
+          <div style={{ marginTop: 16, background: '#f0f9ff', border: '1px solid #93c5fd', borderRadius: 8, padding: 14, fontSize: 13, color: '#1e40af' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 20 }}>⏳</span>
+              <div>
+                <strong>AI Microservice is waking up from sleep mode (Render Free Tier)…</strong>
+                <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#3b82f6' }}>
+                  Render puts free services to sleep after 15 minutes of inactivity. Connecting automatically (attempt {retryCount} of 4, ~15–20s)… Please wait a moment.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Offline Helper Guide (only if retries exhausted) */}
+        {!wakingUp && serviceStatus.checked && !serviceStatus.online && (
           <div style={{ marginTop: 16, background: '#fff8ee', border: '1px solid #f2c94c', borderRadius: 8, padding: 14, fontSize: 13 }}>
-            <strong>💡 Python AI Microservice is currently offline or starting up:</strong>
+            <strong>💡 Python AI Microservice is currently sleeping or offline:</strong>
             <p style={{ margin: '6px 0', color: '#6b4a2f' }}>
-              The Node.js backend communicates with the FastAPI AI service on port <code>8001</code>.
-              To run the AI engine locally:
+              Free tier services sleep when idle. Click below to trigger a wake-up ping:
             </p>
-            <pre style={{ background: '#222', color: '#eee', padding: '8px 12px', borderRadius: 6, overflowX: 'auto', fontSize: 12 }}>
-              cd ai-service &amp;&amp; python3 -m venv venv &amp;&amp; source venv/bin/activate &amp;&amp; pip install -r requirements.txt &amp;&amp; python train_all.py &amp;&amp; uvicorn app.main:app --port 8001
-            </pre>
             <div style={{ marginTop: 8 }}>
-              <button className="btn btn-primary btn-sm" onClick={checkHealth}>Retry Connecting to AI</button>
+              <button className="btn btn-primary btn-sm" onClick={() => checkHealth(4)}>Wake Up AI Service</button>
             </div>
           </div>
         )}
@@ -479,7 +518,10 @@ export default function AIMarketIntelligence() {
               {(!comparison || !comparison.markets) && (
                 <tr>
                   <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 24 }}>
-                    Start the AI service to view real-time inter-mandi price spreads.
+                    <p style={{ margin: '0 0 10px 0' }}>No comparison data loaded yet for {commodity}.</p>
+                    <button className="btn btn-secondary btn-sm" onClick={fetchAIData} disabled={loading}>
+                      {loading ? '⏳ Loading…' : '🔄 Load Inter-Mandi Spreads'}
+                    </button>
                   </td>
                 </tr>
               )}

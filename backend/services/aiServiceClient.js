@@ -10,7 +10,7 @@ const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8001';
 
 const client = axios.create({
   baseURL: AI_SERVICE_URL,
-  timeout: 15000,
+  timeout: 45000,
 });
 
 class AIServiceError extends Error {

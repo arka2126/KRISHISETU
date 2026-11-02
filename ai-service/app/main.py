@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 import time
 
 from fastapi import FastAPI, HTTPException
@@ -57,6 +58,32 @@ else:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+
+def _background_model_train():
+    try:
+        commodities = list_known_commodities()
+        markets = list_known_markets()
+        adapter = get_market_adapter()
+        trained_new = 0
+        for c in commodities:
+            for m in markets:
+                if price_predictor.load_model_meta(c, m) is None:
+                    raw_df = adapter.get_historical_prices(c, m, days=365)
+                    price_predictor.train_price_model(raw_df, c, m)
+                    trained_new += 1
+        if trained_new > 0:
+            logger.info("Background model check: trained %d missing models.", trained_new)
+        else:
+            logger.info("Background model check: all models already present.")
+    except Exception as e:
+        logger.warning("Background model check failed: %s", e)
+
+
+@app.on_event("startup")
+def startup_model_check():
+    """Start background training thread so Uvicorn opens port and answers /health immediately."""
+    threading.Thread(target=_background_model_train, daemon=True).start()
 
 
 @app.get("/", include_in_schema=False)
@@ -189,7 +216,11 @@ def market_insights(req: MarketInsightsRequest):
         try:
             prediction = price_predictor.predict_price(req.commodity, req.market, 1)
         except FileNotFoundError:
-            prediction = {"error": "Model not trained yet. Call /api/v1/train first."}
+            try:
+                price_predictor.train_price_model(raw_df, req.commodity, req.market)
+                prediction = price_predictor.predict_price(req.commodity, req.market, 1)
+            except Exception:
+                prediction = {"error": "Model not trained yet. Call /api/v1/train first."}
 
         return {
             "commodity": req.commodity,
