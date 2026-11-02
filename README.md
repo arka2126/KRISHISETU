@@ -69,12 +69,12 @@ flowchart TD
 - **Quality Assessor Lab:** Grade moisture content, foreign matter, grain cleanliness, and issue tamper-proof digital certificates.
 - **Admin Center:** Platform-wide oversight of commodities, volumes, trade settlements, audit trails, and user permissions.
 
-### 2. ⚡ Real-Time Auction Engine (Socket.IO)
+### 2.  Real-Time Auction Engine (Socket.IO)
 - **Sub-Second Bid Broadcasting:** Bid increments broadcast instantly across all connected participants with 0-refresh WebSockets.
 - **Anti-Sniping & Server Validation:** Server-side validation guarantees bids cannot be placed below reserve price, below minimum increment, or after auction expiration.
 - **Instant Settlement:** Automatic buyer invoice generation, payment simulation, and payout calculation with transparent mandi fee deductions.
 
-### 3. 🤖 AI Market Intelligence Microservice
+### 3.  AI Market Intelligence Microservice
 - **Ensemble Price Estimation:** Trains both `RandomForestRegressor` and `XGBoostRegressor` on engineered market features (lags, rolling averages, seasonality) and picks the winning model with confidence intervals.
 - **Holt-Winters Trend Forecasting:** 7-day, 14-day, and 30-day forward price trajectories with upper/lower bounds.
 - **Anomaly & Price Spike Detection:** Identifies artificial market manipulation or sudden supply gluts using Rolling Z-Score and Isolation Forest models.
