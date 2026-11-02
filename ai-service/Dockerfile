@@ -28,5 +28,5 @@ ENV HOME=/home/user \
 # Hugging Face Spaces uses port 7860 by default
 EXPOSE 7860
 
-# Start FastAPI application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# Start FastAPI application with models pre-trained
+CMD ["sh", "-c", "python train_all.py && uvicorn app.main:app --host 0.0.0.0 --port 7860"]

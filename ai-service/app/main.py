@@ -59,6 +59,28 @@ else:
     )
 
 
+@app.on_event("startup")
+def startup_model_check():
+    """Ensure baseline models exist so ephemeral cloud containers are ready immediately."""
+    try:
+        commodities = list_known_commodities()
+        markets = list_known_markets()
+        adapter = get_market_adapter()
+        trained_new = 0
+        for c in commodities:
+            for m in markets:
+                if price_predictor.load_model_meta(c, m) is None:
+                    raw_df = adapter.get_historical_prices(c, m, days=365)
+                    price_predictor.train_price_model(raw_df, c, m)
+                    trained_new += 1
+        if trained_new > 0:
+            logger.info("Startup model check: trained %d missing models.", trained_new)
+        else:
+            logger.info("Startup model check: all models already present.")
+    except Exception as e:
+        logger.warning("Startup model check failed: %s", e)
+
+
 @app.get("/", include_in_schema=False)
 def root():
     return RedirectResponse(url="/docs")
