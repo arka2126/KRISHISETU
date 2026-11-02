@@ -15,7 +15,7 @@ By pairing **real-time WebSocket digital auctions** with an **autonomous Python 
 
 ---
 
-## 🏛️ System Architecture
+##  System Architecture
 
 ```mermaid
 flowchart TD
@@ -60,9 +60,9 @@ flowchart TD
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 1. 🧑‍🌾 Complete 5-Role Ecosystem
+### 1. Complete 5-Role Ecosystem
 - **Farmer Portal:** Register produce batches, track warehouse lots, monitor live mandi bids, and verify instant direct bank settlements.
 - **Buyer Room:** Browse cataloged lots with lab test certificates, join high-speed real-time bidding rooms, and generate auto-invoices.
 - **Mandi Staff Hub:** Weighbridge intake, gate entry generation, lot status management, and auction initialization.
@@ -82,7 +82,7 @@ flowchart TD
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Domain | Technologies & Libraries |
 |---|---|
@@ -95,7 +95,7 @@ flowchart TD
 
 ---
 
-## 📂 Repository Structure
+##  Repository Structure
 
 ```
 krishisetu/
@@ -135,7 +135,7 @@ krishisetu/
 
 ---
 
-## 🚀 Local Development Setup
+## Local Development Setup
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher
@@ -229,7 +229,7 @@ npm run dev
 
 ---
 
-## 🔑 Demo Login Credentials
+##  Demo Login Credentials
 
 All seeded demo accounts use the standard password:
 ```
@@ -248,7 +248,7 @@ Demo@123
 
 ---
 
-## 🔄 End-to-End Workflow Walkthrough
+##  End-to-End Workflow Walkthrough
 
 Experience the full journey from harvest to payout:
 
@@ -283,7 +283,7 @@ sequenceDiagram
 
 ---
 
-## 🌐 Production Deployment Architecture
+##  Production Deployment Architecture
 
 KrishiSetu is designed with a modern decoupled cloud architecture:
 
@@ -331,7 +331,7 @@ ALLOWED_ORIGINS=https://krishisetu-nine.vercel.app,https://krishisetu-on9g.onren
 
 ---
 
-## 🛡️ Security & Integrity Highlights
+##  Security & Integrity Highlights
 
 - **Server-Side Bid Authoritative Validation:** Clients cannot submit counterfeit bid amounts or tamper with timestamps; all bids are strictly verified against the MongoDB atomic log.
 - **Role-Based Middlewares:** Secured routes use `protect` and `authorize('farmer', 'buyer', 'mandi_staff', 'admin')` decorators.
@@ -340,7 +340,7 @@ ALLOWED_ORIGINS=https://krishisetu-nine.vercel.app,https://krishisetu-on9g.onren
 
 ---
 
-## ⚖️ License & Disclaimer
+##  License & Disclaimer
 
 This project is open-source under the [MIT License](LICENSE).
 
