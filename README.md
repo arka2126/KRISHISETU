@@ -20,7 +20,7 @@ By pairing **real-time WebSocket digital auctions** with an **autonomous Python 
 ```mermaid
 flowchart TD
     subgraph ClientLayer ["Client Layer (React 18 + Vite)"]
-        UI["Web App (Vercel / Netlify)"]
+        UI["Web App (Vercel)"]
         UI -->|SPA Routes| P1["Farmer Portal"]
         UI -->|SPA Routes| P2["Buyer Live Auction Room"]
         UI -->|SPA Routes| P3["Mandi Staff Gate Entry"]
@@ -41,7 +41,7 @@ flowchart TD
     end
 
     subgraph AILayer ["AI Intelligence Microservice (Python & FastAPI)"]
-        FastAPI["AI Service (Render / Hugging Face Spaces)"]
+        FastAPI["AI Service (Render)"]
         Predictor["Price Predictor (XGBoost / RandomForest)"]
         Forecaster["Time Series Forecaster (Holt-Winters)"]
         Anomaly["Anomaly Detector (Z-Score + Isolation Forest)"]
