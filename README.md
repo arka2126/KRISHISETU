@@ -289,7 +289,7 @@ KrishiSetu is designed with a modern decoupled cloud architecture:
 
 ```
 ┌─────────────────────────┐
-│         Vercel              │ ◄── React 18 SPA (Fast Global Edge CDN)
+│         Vercel          │ ◄── React 18 SPA (Fast Global Edge CDN)
 └───────────┬─────────────┘
             │ HTTPS / WSS
             ▼
