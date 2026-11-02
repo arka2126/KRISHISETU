@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 import time
 
 from fastapi import FastAPI, HTTPException
@@ -59,9 +60,7 @@ else:
     )
 
 
-@app.on_event("startup")
-def startup_model_check():
-    """Ensure baseline models exist so ephemeral cloud containers are ready immediately."""
+def _background_model_train():
     try:
         commodities = list_known_commodities()
         markets = list_known_markets()
@@ -74,11 +73,17 @@ def startup_model_check():
                     price_predictor.train_price_model(raw_df, c, m)
                     trained_new += 1
         if trained_new > 0:
-            logger.info("Startup model check: trained %d missing models.", trained_new)
+            logger.info("Background model check: trained %d missing models.", trained_new)
         else:
-            logger.info("Startup model check: all models already present.")
+            logger.info("Background model check: all models already present.")
     except Exception as e:
-        logger.warning("Startup model check failed: %s", e)
+        logger.warning("Background model check failed: %s", e)
+
+
+@app.on_event("startup")
+def startup_model_check():
+    """Start background training thread so Uvicorn opens port and answers /health immediately."""
+    threading.Thread(target=_background_model_train, daemon=True).start()
 
 
 @app.get("/", include_in_schema=False)
