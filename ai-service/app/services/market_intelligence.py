@@ -1,18 +1,15 @@
 """
-Composes the lower-level models (price predictor, trend, anomaly) into the
-higher-level "market intelligence" outputs: market comparison, demand/supply
-analysis, and templated (not random) recommendations.
+Market intelligence services: cross-mandi price comparisons, demand/supply balance,
+and data-driven dispatch recommendations.
 
-Every value returned is traced back to something computed above; recommendation
-text only ever references numbers that are also returned in the payload, and each
-top-level section is tagged OBSERVED_DATA / AI_PREDICTION / AI_INSIGHT per spec.
+Each output section includes data provenance tags (OBSERVED_DATA, AI_PREDICTION, AI_INSIGHT)
+to make AI-generated predictions transparent and traceable.
 """
 
 from __future__ import annotations
 
 from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 from app.data.adapters import get_market_adapter, list_known_markets

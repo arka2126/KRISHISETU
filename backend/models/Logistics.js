@@ -1,11 +1,5 @@
-// Simulated logistics/delivery tracking for a sold lot.
-//
-// HONESTY NOTE: there is no real GPS/telematics hardware or courier API behind
-// this. "Tracking" here means a simulated checkpoint route (pickup -> one or
-// two transit hubs -> destination) that advances when `advance` is called
-// (normally by mandi/admin staff, standing in for a driver's app or a real
-// carrier webhook). Locations are place-name checkpoints, not fabricated GPS
-// coordinates, so nothing here misrepresents itself as real telemetry.
+// Logistics and dispatch tracking for settled commodity lots.
+// Tracks lifecycle milestones from mandi gate dispatch through regional transit hubs to buyer delivery.
 const mongoose = require('mongoose');
 
 const logisticsSchema = new mongoose.Schema(

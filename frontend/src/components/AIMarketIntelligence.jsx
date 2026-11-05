@@ -123,7 +123,6 @@ export default function AIMarketIntelligence() {
   const renderForecastChart = (forecastList) => {
     if (!forecastList || forecastList.length === 0) return null;
 
-    const prices = forecastList.map((f) => f.predicted_price);
     const minP = Math.min(...forecastList.map((f) => f.lower_bound || f.predicted_price)) * 0.98;
     const maxP = Math.max(...forecastList.map((f) => f.upper_bound || f.predicted_price)) * 1.02;
     const range = maxP - minP || 1;

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import DashboardLayout from '../layouts/DashboardLayout';
 import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
 
 const links = [
   { to: '/mandi/dashboard', label: 'Overview' },

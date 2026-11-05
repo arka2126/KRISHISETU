@@ -1,9 +1,4 @@
-// Renders a Logistics record: progress bar across simulated waypoints, current
-// status, and a timestamped history feed. Read-only display — advancing the
-// shipment (mandi/admin only) is handled by the parent via onAdvance/onCreate.
-//
-// HONESTY NOTE (inherited from the backend model): waypoints are simulated
-// checkpoints, not real GPS coordinates or a live courier feed.
+// Visual shipment tracker: displays milestone status, route waypoints, and dispatch history.
 import React from 'react';
 
 const STATUS_LABELS = {

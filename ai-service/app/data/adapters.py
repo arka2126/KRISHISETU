@@ -1,16 +1,9 @@
 """
-Data source adapters for KrishiSetu AI service.
+Data source adapters for the KrishiSetu AI service.
 
-DESIGN PRINCIPLE (see project spec, "DO NOT CHEAT" section):
-- Every adapter implements the same `MarketDataAdapter` / `WeatherAdapter` interface.
-- A REAL adapter (Agmarknet/e-NAM, a weather provider, etc.) can be dropped in later
-  by implementing the interface and reading its API key from the environment.
-- Until real credentials exist, `MockMarketDataProvider` / `MockWeatherProvider`
-  generate clearly-labeled synthetic data so the rest of the pipeline (cleaning,
-  feature engineering, modeling) can be built and tested end-to-end.
-- Every record returned carries a `source` field: "MOCK_DATA" or the real
-  provider's name. The API layer forwards this to the frontend so users are never
-  told synthetic data is verified real-world data.
+Defines pluggable interfaces (`MarketDataAdapter`, `WeatherAdapter`) allowing seamless
+switching between live market APIs (Agmarknet, e-NAM, OpenWeatherMap) and local synthetic
+generators during testing. Each record carries a provenance tag for auditability.
 """
 
 from __future__ import annotations

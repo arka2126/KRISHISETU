@@ -1,16 +1,9 @@
 """
-Multi-day forecasting (7-day / 30-day horizons).
+Multi-day commodity price forecasting using Holt-Winters exponential smoothing (statsmodels).
 
-MODEL CHOICE (per spec: "Do NOT blindly use every model; choose based on data
-availability"): Holt-Winters exponential smoothing (statsmodels) is used instead
-of Prophet. Prophet pulls in a heavy Stan toolchain that is unnecessary for daily
-series with a single, mild yearly seasonal cycle like these — Holt-Winters
-handles trend + seasonality directly and fits in milliseconds. If longer,
-multi-seasonal series are added later, swapping in Prophet here is a contained
-change (same input/output contract).
-
-Confidence is derived from backtested residuals (walk-forward on held-out days),
-not an arbitrary number.
+Holt-Winters is selected for its fast fitting, lightweight footprint, and accurate handling
+of daily trends with mild annual seasonality without requiring heavy C++ compilers or Stan.
+Confidence bands are derived from walk-forward backtested residual errors.
 """
 
 from __future__ import annotations

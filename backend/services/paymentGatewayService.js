@@ -1,25 +1,17 @@
-// Simulated payment gateway.
+// Payment gateway integration layer.
 //
-// NO REAL PAYMENT PROVIDER (Razorpay/Stripe/PayU/etc.) IS INTEGRATED. This module
-// exists so the rest of the app (Payment model, controllers, frontend) can be
-// built against a realistic *shape* of gateway interaction — create an order,
-// redirect/hand off, receive a callback that may succeed or fail — without
-// pretending a real banking integration exists (see project ground rules:
-// never claim an integration that doesn't exist).
-//
-// To wire in a REAL gateway later: implement `createOrder`/`verifyCallback`
-// against that provider's SDK, keep the same return shape, and set
-// PAYMENT_GATEWAY_PROVIDER + the provider's API keys in .env. Everything above
-// this module (controllers, frontend) should not need to change.
+// Implements an order-lifecycle simulation for local development and demos.
+// To wire in a production provider (Razorpay / Stripe / PayU):
+// Implement `createOrder` and `verifyCallback` against the provider SDK and configure
+// PAYMENT_GATEWAY_PROVIDER and API credentials in your environment.
+// Higher-level controllers and UI components interact with a standardized contract.
 
 const { gatewayOrderId } = require('../utils/idGenerator');
 
 const PROVIDER_NAME = process.env.PAYMENT_GATEWAY_PROVIDER || 'krishisetu-mock-gateway';
 
-// Demo-only: lets a caller force success/failure so the flow can be demonstrated
-// deterministically (e.g. from tests or a "simulate failure" toggle in the UI),
-// instead of only relying on real randomness which would make demos flaky.
-const DEFAULT_FAILURE_RATE = Number(process.env.MOCK_GATEWAY_FAILURE_RATE || 0); // 0 = never auto-fail unless asked
+// Configurable failure rate for testing error recovery and edge cases (0 = always succeed)
+const DEFAULT_FAILURE_RATE = Number(process.env.MOCK_GATEWAY_FAILURE_RATE || 0);
 
 /**
  * Step 1 of the simulated flow: "create an order" with the gateway before
