@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application files and pre-trained models
 COPY --chown=user . .
 
+# Pre-train baseline models into the Docker image
+RUN python train_all.py
+
 # Switch to non-root user
 USER user
 ENV HOME=/home/user \
