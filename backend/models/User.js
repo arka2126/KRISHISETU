@@ -4,9 +4,14 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true, minlength: 2, maxlength: 50 },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    phone: { type: String, required: true, trim: true },
+    phone: {
+      type: String,
+      required: [true, 'Phone number is required'],
+      trim: true,
+      match: [/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number'],
+    },
     password: { type: String, required: true, select: false }, // bcrypt hash, hidden by default
     role: {
       type: String,

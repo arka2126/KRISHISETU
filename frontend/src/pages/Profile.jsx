@@ -15,7 +15,7 @@ const ROLE_LABELS = {
   admin: 'Administrator',
 };
 
-function Field({ label, value, onChange, placeholder, type = 'text' }) {
+function Field({ label, value, onChange, placeholder, type = 'text', maxLength, inputMode }) {
   return (
     <div className="form-group">
       <label className="form-label">{label}</label>
@@ -24,6 +24,8 @@ function Field({ label, value, onChange, placeholder, type = 'text' }) {
         type={type}
         value={value || ''}
         placeholder={placeholder}
+        maxLength={maxLength}
+        inputMode={inputMode}
         onChange={(e) => onChange(e.target.value)}
       />
     </div>
@@ -72,8 +74,16 @@ export default function Profile() {
     e.preventDefault();
     setSavingProfile(true);
     setProfileMsg(null);
+
+    const trimmedPhone = (form.phone || '').trim();
+    if (trimmedPhone && !/^[6-9]\d{9}$/.test(trimmedPhone)) {
+      setProfileMsg({ type: 'error', text: 'Phone number must be a valid 10-digit Indian mobile number (starting with 6, 7, 8, or 9)' });
+      setSavingProfile(false);
+      return;
+    }
+
     try {
-      const payload = { name: form.name, phone: form.phone, address: form.address };
+      const payload = { name: form.name.trim(), phone: trimmedPhone, address: form.address };
       if (me.role === 'farmer') {
         payload.farmDetails = form.farmDetails;
         payload.bankDetails = form.bankDetails;
@@ -152,7 +162,15 @@ export default function Profile() {
           )}
           <div className="grid grid-2">
             <Field label="Full Name" value={form.name} onChange={(v) => setField('name', v)} />
-            <Field label="Phone" value={form.phone} onChange={(v) => setField('phone', v)} />
+            <Field
+              label="Phone (10 digits)"
+              type="tel"
+              maxLength={10}
+              inputMode="numeric"
+              placeholder="10-digit mobile number"
+              value={form.phone}
+              onChange={(v) => setField('phone', v.replace(/\D/g, '').slice(0, 10))}
+            />
           </div>
           <div className="form-group">
             <label className="form-label">Email (cannot be changed)</label>

@@ -21,7 +21,8 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       return { success: true };
     } catch (err) {
-      return { success: false, message: err.response?.data?.message || 'Login failed' };
+      const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || 'Login failed';
+      return { success: false, message: msg };
     } finally {
       setLoading(false);
     }
@@ -36,7 +37,8 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       return { success: true };
     } catch (err) {
-      return { success: false, message: err.response?.data?.message || 'Registration failed' };
+      const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || 'Registration failed';
+      return { success: false, message: msg };
     } finally {
       setLoading(false);
     }

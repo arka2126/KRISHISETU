@@ -17,18 +17,23 @@ const register = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'All fields are required' });
   }
 
-  const existing = await User.findOne({ email: email.toLowerCase() });
+  const existing = await User.findOne({ email: email.toLowerCase().trim() });
   if (existing) {
     return res.status(409).json({ success: false, message: 'Email already registered' });
+  }
+
+  const existingPhone = await User.findOne({ phone: phone.trim() });
+  if (existingPhone) {
+    return res.status(409).json({ success: false, message: 'Phone number already registered' });
   }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
   const user = await User.create({
-    name,
-    email: email.toLowerCase(),
-    phone,
+    name: name.trim(),
+    email: email.toLowerCase().trim(),
+    phone: phone.trim(),
     password: hashedPassword,
     role,
     address,

@@ -20,7 +20,8 @@ export default function Login() {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
-    const res = await login(form.email, form.password);
+    const email = form.email.trim().toLowerCase();
+    const res = await login(email, form.password);
     if (res.success) {
       const stored = JSON.parse(localStorage.getItem('ks_user'));
       navigate(dashboardPath[stored.role] || '/');
