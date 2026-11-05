@@ -41,7 +41,7 @@ flowchart TD
     end
 
     subgraph AILayer ["AI Intelligence Microservice (Python & FastAPI)"]
-        FastAPI["AI Service (Render)"]
+        FastAPI["AI Service (Hugging Face Spaces / Docker)"]
         Predictor["Price Predictor (XGBoost / RandomForest)"]
         Forecaster["Time Series Forecaster (Holt-Winters)"]
         Anomaly["Anomaly Detector (Z-Score + Isolation Forest)"]
@@ -91,7 +91,7 @@ flowchart TD
 | **Database** | MongoDB Atlas, Mongoose ODM |
 | **AI / ML Service** | Python 3.11, FastAPI, Uvicorn, Scikit-Learn, XGBoost, Pandas, NumPy, Statsmodels |
 | **Authentication** | JWT (JSON Web Tokens), Bcrypt.js password hashing, Role-Based Access Control |
-| **Hosting & Cloud** | Vercel (Frontend), Render (Node Backend & Python AI), MongoDB Atlas |
+| **Hosting & Cloud** | Vercel (Frontend), Render (Node Backend), Hugging Face Spaces (Python AI), MongoDB Atlas |
 
 ---
 
@@ -125,10 +125,12 @@ krishisetu/
 │   │   ├── services/             # Market comparison & recommendation engine
 │   │   └── main.py               # FastAPI application endpoints
 │   ├── saved_models/             # Serialized .joblib and meta .json models
-│   ├── Dockerfile                # Production container for Hugging Face / Render
+│   ├── Dockerfile                # Production container for Hugging Face Spaces (Port 7860)
+│   ├── push-to-hf.sh             # One-click deploy script to Hugging Face Spaces
 │   ├── train_all.py              # CLI batch training script
 │   └── requirements.txt          # Python dependencies
 │
+├── LICENSE                       # MIT Open-Source License
 └── README.md
 ```
 
@@ -299,10 +301,18 @@ KrishiSetu is designed with a modern decoupled cloud architecture:
             │ Internal REST
             ▼
 ┌─────────────────────────┐
-│          Render         │ ◄── Python FastAPI AI Microservice
-│  FastAPI + Scikit/XGB   │     (2 vCPU / 16 GB RAM)
+│   Hugging Face Spaces   │ ◄── Python FastAPI AI Microservice (Docker)
+│  FastAPI + Scikit/XGB   │     (2 vCPU / 16 GB RAM Dedicated Free Tier)
 └─────────────────────────┘
 ```
+
+### Deploying the AI Service (Hugging Face Spaces)
+The AI microservice can be packaged and deployed directly to Hugging Face Spaces with a single command using the included helper script:
+```bash
+cd ai-service
+./push-to-hf.sh <your-hf-username> [space-name]
+```
+> The script automatically builds and deploys the container. Hugging Face provides **16 GB RAM** for free, ensuring the 60+ machine learning models train and run without out-of-memory errors.
 
 ### Environment Variable Reference
 
@@ -319,14 +329,35 @@ MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/krishisetu
 JWT_SECRET=your_production_jwt_secret
 JWT_EXPIRES_IN=7d
 CLIENT_URL=https://krishisetu-nine.vercel.app
-AI_SERVICE_URL=https://krishisetu-ai-mbap.onrender.com
+AI_SERVICE_URL=https://<your-hf-username>-krishisetu-ai.hf.space
 ```
 
-#### AI Microservice (`Render`)
+#### AI Microservice (`Hugging Face Spaces / Docker`)
 ```env
-PORT=7860          # Render injects its own PORT; the Dockerfile default is 7860
+PORT=7860
 ALLOWED_ORIGINS=https://krishisetu-nine.vercel.app,https://krishisetu-on9g.onrender.com
 ```
+
+---
+
+##  REST API Reference
+
+| Endpoint | Method | Access | Description |
+|---|---|---|---|
+| `/api/auth/register` | `POST` | Public | Register new `farmer` or `buyer` account |
+| `/api/auth/login` | `POST` | Public | Authenticate user & receive JWT token |
+| `/api/lots` | `GET`, `POST` | Protected | List lots or create a new lot (mandi staff) |
+| `/api/lots/:id` | `GET`, `PUT` | Protected | Fetch lot details or update status |
+| `/api/quality-reports` | `GET`, `POST` | Assessor | Pending inspections or submit grading results |
+| `/api/auctions` | `GET`, `POST` | Protected | List active auctions or create auction room |
+| `/api/auctions/:id/bids` | `POST` | Buyer | Place authoritative bid on an active auction |
+| `/api/payments/initiate` | `POST` | Buyer | Initiate payment for won auction lot |
+| `/api/logistics` | `GET`, `POST` | Protected | Dispatch tracking & milestone updates |
+| `/api/ai/health` | `GET` | Public | AI service status and known mandis |
+| `/api/ai/market-insights`| `POST` | Public | Aggregated price forecast, trend, and anomalies |
+| `/api/ai/forecast` | `POST` | Public | 7-day to 30-day Holt-Winters price forecasting |
+| `/api/ai/market-comparison`| `POST` | Public | Cross-mandi arbitrage price spread |
+| `/api/ai/recommendations` | `POST` | Public | Dispatch & selling timing recommendations |
 
 ---
 
