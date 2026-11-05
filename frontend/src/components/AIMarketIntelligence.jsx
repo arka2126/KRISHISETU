@@ -21,6 +21,8 @@ export default function AIMarketIntelligence() {
   const [wakingUp, setWakingUp] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [loadingComparison, setLoadingComparison] = useState(false);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
   const [error, setError] = useState(null);
 
   // AI Data States
@@ -56,34 +58,14 @@ export default function AIMarketIntelligence() {
     }
   };
 
-  // Fetch AI data when selection or tab changes
-  useEffect(() => {
-    if (serviceStatus.online) {
-      fetchAIData();
-    }
-  }, [commodity, market, horizon, serviceStatus.online]);
-
-  useEffect(() => {
-    if (serviceStatus.online) {
-      if (
-        (activeTab === 'comparison' && !comparison) ||
-        (activeTab === 'recommendations' && !recommendations) ||
-        (activeTab === 'forecast' && !forecast)
-      ) {
-        fetchAIData();
-      }
-    }
-  }, [activeTab]);
-
-  const fetchAIData = async () => {
+  // Fetch primary insights (fast: 1 market)
+  const fetchPrimaryInsights = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [insightsRes, forecastRes, compRes, recRes] = await Promise.allSettled([
+      const [insightsRes, forecastRes] = await Promise.allSettled([
         api.post('/ai/market-insights', { commodity, market }),
         api.post('/ai/forecast', { commodity, market, horizon_days: Number(horizon) }),
-        api.post('/ai/market-comparison', { commodity }),
-        api.post('/ai/recommendations', { commodity }),
       ]);
 
       if (insightsRes.status === 'fulfilled' && insightsRes.value.data?.success) {
@@ -92,18 +74,71 @@ export default function AIMarketIntelligence() {
       if (forecastRes.status === 'fulfilled' && forecastRes.value.data?.success) {
         setForecast(forecastRes.value.data.data);
       }
-      if (compRes.status === 'fulfilled' && compRes.value.data?.success) {
-        setComparison(compRes.value.data.data);
-      }
-      if (recRes.status === 'fulfilled' && recRes.value.data?.success) {
-        setRecommendations(recRes.value.data.data);
-      }
     } catch (err) {
       setError('Failed to fetch AI insights. Ensure models are trained.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Fetch cross-mandi comparison for current commodity (across 5 mandis)
+  const fetchComparison = async () => {
+    setLoadingComparison(true);
+    try {
+      const res = await api.post('/ai/market-comparison', { commodity });
+      if (res.data?.success) {
+        setComparison(res.data.data);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch market comparison:', err);
+    } finally {
+      setLoadingComparison(false);
+    }
+  };
+
+  // Fetch AI recommendations for current commodity
+  const fetchRecommendations = async () => {
+    setLoadingRecommendations(true);
+    try {
+      const res = await api.post('/ai/recommendations', { commodity });
+      if (res.data?.success) {
+        setRecommendations(res.data.data);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch recommendations:', err);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
+  const fetchAIData = async () => {
+    fetchPrimaryInsights();
+    fetchComparison();
+    fetchRecommendations();
+  };
+
+  // Fetch primary data when selection changes
+  useEffect(() => {
+    if (serviceStatus.online) {
+      fetchPrimaryInsights();
+      if (activeTab === 'comparison') {
+        fetchComparison();
+      } else if (activeTab === 'recommendations') {
+        fetchRecommendations();
+      }
+    }
+  }, [commodity, market, horizon, serviceStatus.online]);
+
+  // Lazy-load tab data on demand when switching tabs
+  useEffect(() => {
+    if (serviceStatus.online) {
+      if (activeTab === 'comparison' && (!comparison || comparison.commodity !== commodity)) {
+        fetchComparison();
+      } else if (activeTab === 'recommendations' && (!recommendations || recommendations.commodity !== commodity)) {
+        fetchRecommendations();
+      }
+    }
+  }, [activeTab]);
 
   const getTrendBadge = (direction) => {
     switch (direction) {
@@ -453,7 +488,7 @@ export default function AIMarketIntelligence() {
       )}
 
       {/* TAB 2: CROSS-MANDI COMPARISON */}
-      {!loading && activeTab === 'comparison' && (
+      {activeTab === 'comparison' && (
         <div className="card">
           <div className="flex-between" style={{ marginBottom: 16 }}>
             <div>
@@ -462,11 +497,16 @@ export default function AIMarketIntelligence() {
                 Compare current market rates and next-day price projections across major agricultural hubs.
               </p>
             </div>
-            {comparison?.price_spread && (
-              <span className="badge badge-green" style={{ fontSize: 13 }}>
-                Max Spread: ₹{comparison.price_spread}/qtl
-              </span>
-            )}
+            <div className="flex gap-12" style={{ alignItems: 'center' }}>
+              {comparison?.price_spread && (
+                <span className="badge badge-green" style={{ fontSize: 13 }}>
+                  Max Spread: ₹{comparison.price_spread}/qtl
+                </span>
+              )}
+              <button className="btn btn-secondary btn-sm" onClick={fetchComparison} disabled={loadingComparison}>
+                {loadingComparison ? '⏳ Loading…' : '🔄 Refresh Spreads'}
+              </button>
+            </div>
           </div>
 
           <table>
@@ -481,7 +521,7 @@ export default function AIMarketIntelligence() {
               </tr>
             </thead>
             <tbody>
-              {comparison?.markets?.map((m) => {
+              {comparison?.commodity === commodity && comparison?.markets?.map((m) => {
                 const isHighest = m.market === comparison.highest_price_market;
                 return (
                   <tr key={m.market} style={isHighest ? { background: '#f5faf6' } : {}}>
@@ -514,12 +554,22 @@ export default function AIMarketIntelligence() {
                   </tr>
                 );
               })}
-              {(!comparison || !comparison.markets) && (
+              {loadingComparison && (
+                <tr>
+                  <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 36 }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ fontSize: 18 }}>⏳</span>
+                      <span>Calculating live price spreads and tomorrow's forecast across 5 mandis…</span>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {!loadingComparison && (!comparison || !comparison.markets || comparison.commodity !== commodity) && (
                 <tr>
                   <td colSpan={6} className="muted" style={{ textAlign: 'center', padding: 24 }}>
                     <p style={{ margin: '0 0 10px 0' }}>No comparison data loaded yet for {commodity}.</p>
-                    <button className="btn btn-secondary btn-sm" onClick={fetchAIData} disabled={loading}>
-                      {loading ? '⏳ Loading…' : '🔄 Load Inter-Mandi Spreads'}
+                    <button className="btn btn-secondary btn-sm" onClick={fetchComparison} disabled={loadingComparison}>
+                      {loadingComparison ? '⏳ Loading…' : '🔄 Load Inter-Mandi Spreads'}
                     </button>
                   </td>
                 </tr>
@@ -530,18 +580,31 @@ export default function AIMarketIntelligence() {
       )}
 
       {/* TAB 3: AI RECOMMENDATIONS */}
-      {!loading && activeTab === 'recommendations' && (
+      {activeTab === 'recommendations' && (
         <div className="card">
-          <h3 style={{ marginTop: 0, fontSize: 16 }}>Data-Grounded Selling &amp; Buying Advice</h3>
-          <p className="muted" style={{ fontSize: 13, marginBottom: 20 }}>
-            Every suggestion is generated by cross-referencing live market arrivals, price elasticity, and multi-day trend slopes.
-          </p>
+          <div className="flex-between" style={{ marginBottom: 16 }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 16 }}>Data-Grounded Selling &amp; Buying Advice</h3>
+              <p className="muted" style={{ fontSize: 13, margin: '4px 0 0' }}>
+                Every suggestion is generated by cross-referencing live market arrivals, price elasticity, and multi-day trend slopes.
+              </p>
+            </div>
+            <button className="btn btn-secondary btn-sm" onClick={fetchRecommendations} disabled={loadingRecommendations}>
+              {loadingRecommendations ? '⏳ Loading…' : '🔄 Refresh Recommendations'}
+            </button>
+          </div>
 
-          {recommendations?.recommendation_text ? (
+          {loadingRecommendations && (
+            <div className="flex-center" style={{ padding: 40 }}>
+              <span className="muted">⏳ Analyzing cross-mandi arbitrage and generating trade recommendations for {commodity}…</span>
+            </div>
+          )}
+
+          {!loadingRecommendations && recommendations?.commodity === commodity && recommendations?.recommendation_text ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {recommendations.recommendation_text.map((text, i) => {
-                const isPrediction = text.startsWith('[AI_PREDICTION]');
                 const isInsight = text.startsWith('[AI_INSIGHT]');
+                const isPrediction = text.startsWith('[AI_PREDICTION]');
                 const isObserved = text.startsWith('[OBSERVED_DATA]');
 
                 return (
@@ -564,10 +627,13 @@ export default function AIMarketIntelligence() {
                 );
               })}
             </div>
-          ) : (
-            <p className="muted" style={{ padding: 20, textAlign: 'center' }}>
-              Connect the AI service to receive real-time dispatch and trade timing recommendations.
-            </p>
+          ) : !loadingRecommendations && (
+            <div style={{ padding: 24, textAlign: 'center' }}>
+              <p className="muted" style={{ margin: '0 0 10px 0' }}>No recommendations generated yet for {commodity}.</p>
+              <button className="btn btn-secondary btn-sm" onClick={fetchRecommendations} disabled={loadingRecommendations}>
+                {loadingRecommendations ? '⏳ Loading…' : '🔄 Generate Recommendations'}
+              </button>
+            </div>
           )}
         </div>
       )}

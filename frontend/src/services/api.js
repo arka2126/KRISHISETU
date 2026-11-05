@@ -19,6 +19,11 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('ks_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+
+  // ML inference and multi-mandi comparisons require extra headroom on free cloud tiers
+  if (config.url && config.url.includes('/ai/')) {
+    config.timeout = 60000;
+  }
   return config;
 });
 
