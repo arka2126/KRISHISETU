@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import CommodityCard from '../components/CommodityCard';
 import api from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Marketplace() {
+  const { t } = useLanguage();
   const [lots, setLots] = useState([]);
   const [commodities, setCommodities] = useState([]);
   const [filters, setFilters] = useState({ commodity: '', search: '' });
@@ -40,19 +42,28 @@ export default function Marketplace() {
     <div>
       <Navbar />
       <div className="container" style={{ padding: '32px 20px' }}>
-        <h1 className="section-title" style={{ marginTop: 0 }}>Marketplace</h1>
+        <h1 className="section-title" style={{ marginTop: 0 }}>{t('marketplace.title', 'Marketplace')}</h1>
         <div className="card flex gap-16" style={{ marginBottom: 24, flexWrap: 'wrap' }}>
-          <input className="form-input" placeholder="Search commodity or mandi…" style={{ maxWidth: 260 }}
-            value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} />
-          <select className="form-select" style={{ maxWidth: 220 }} value={filters.commodity}
-            onChange={(e) => setFilters({ ...filters, commodity: e.target.value })}>
-            <option value="">All commodities</option>
+          <input
+            className="form-input"
+            placeholder={t('marketplace.searchPlaceholder', 'Search commodity or mandi…')}
+            style={{ maxWidth: 260 }}
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+          />
+          <select
+            className="form-select"
+            style={{ maxWidth: 220 }}
+            value={filters.commodity}
+            onChange={(e) => setFilters({ ...filters, commodity: e.target.value })}
+          >
+            <option value="">{t('marketplace.allCommodities', 'All commodities')}</option>
             {commodities.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
           </select>
         </div>
 
-        {loading ? <p className="muted">Loading lots…</p> : (
-          filtered.length === 0 ? <p className="muted">No lots match your filters right now.</p> : (
+        {loading ? <p className="muted">{t('marketplace.loadingLots', 'Loading lots…')}</p> : (
+          filtered.length === 0 ? <p className="muted">{t('marketplace.noLots', 'No lots match your filters right now.')}</p> : (
             <div className="grid grid-3">
               {filtered.map((lot) => <CommodityCard key={lot._id} lot={lot} />)}
             </div>

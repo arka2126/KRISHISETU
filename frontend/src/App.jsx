@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import OfflineBanner from './components/OfflineBanner';
+import InstallAppBanner from './components/InstallAppBanner';
 
 // Route-level code splitting: each page ships as its own small chunk that
 // only downloads when the user actually navigates there, instead of one
@@ -39,6 +40,7 @@ export default function App() {
   return (
     <>
       <OfflineBanner />
+      <InstallAppBanner />
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/" element={<Landing />} />
