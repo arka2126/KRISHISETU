@@ -3,9 +3,11 @@
 // often (lifts, basements, moving between towers) — without this, pages
 // just silently fail to load with no explanation.
 import React, { useEffect, useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function OfflineBanner() {
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const goOnline = () => setOnline(true);
@@ -35,7 +37,7 @@ export default function OfflineBanner() {
         fontWeight: 600,
       }}
     >
-      You're offline — some features won't work until your connection is back.
+      {t('common.offlineNotice', "You're offline — some features won't work until your connection is back.")}
     </div>
   );
 }

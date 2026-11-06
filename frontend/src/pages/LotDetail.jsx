@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar';
 import ShipmentTracker from '../components/ShipmentTracker';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const PAYMENT_METHODS = [
   { value: 'upi', label: 'UPI' },
@@ -18,6 +19,7 @@ const PAYMENT_METHODS = [
 export default function LotDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const [lot, setLot] = useState(null);
   const [auction, setAuction] = useState(null);
@@ -134,13 +136,26 @@ export default function LotDetail() {
       <Navbar />
       <div className="container" style={{ padding: '32px 20px', maxWidth: 700 }}>
         <div className="card">
-          <h2 style={{ marginTop: 0 }}>{lot.commodity?.name} — Lot #{lot.lotId}</h2>
-          <p className="muted">{lot.mandi} · Seller: {lot.farmer?.name}</p>
-          <div className="grid grid-2" style={{ fontSize: 14 }}>
-            <div><span className="muted">Quantity</span><br /><strong>{lot.quantity} qtl</strong></div>
-            <div><span className="muted">Quality Grade</span><br /><strong>{lot.qualityReport?.grade || '—'}</strong></div>
-            <div><span className="muted">Base Price</span><br /><strong>₹{lot.basePrice}</strong></div>
-            <div><span className="muted">Status</span><br /><span className="badge badge-green">{lot.status}</span></div>
+          <div className="flex-between" style={{ alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
+            <div>
+              <h2 style={{ margin: '0 0 4px' }}>{lot.commodity?.name} — {t('commodity.lotNumber', 'Lot #')}{lot.lotId}</h2>
+              <p className="muted" style={{ margin: 0 }}>{lot.mandi} · {t('lotDetail.seller', 'Seller')}: {lot.farmer?.name}</p>
+            </div>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`🌾 ${lot.commodity?.name} (${t('commodity.lotNumber', 'Lot #')}${lot.lotId}) on KrishiSetu:\n• ${t('commodity.quantity', 'Quantity')}: ${lot.quantity} ${t('commodity.qtl', 'qtl')}\n• ${t('commodity.basePrice', 'Base Price')}: ₹${lot.basePrice}\n• Mandi: ${lot.mandi}\n\nView details: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-sm"
+              style={{ background: '#25D366', color: '#fff', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+            >
+              <span>💬</span> WhatsApp
+            </a>
+          </div>
+          <div className="grid grid-2" style={{ fontSize: 14, marginTop: 16 }}>
+            <div><span className="muted">{t('commodity.quantity', 'Quantity')}</span><br /><strong>{lot.quantity} {t('commodity.qtl', 'qtl')}</strong></div>
+            <div><span className="muted">{t('lotDetail.qualityGrade', 'Quality Grade')}</span><br /><strong>{lot.qualityReport?.grade || '—'}</strong></div>
+            <div><span className="muted">{t('commodity.basePrice', 'Base Price')}</span><br /><strong>₹{lot.basePrice}</strong></div>
+            <div><span className="muted">{t('lotDetail.status', 'Status')}</span><br /><span className="badge badge-green">{lot.status}</span></div>
           </div>
         </div>
 
