@@ -1,13 +1,3 @@
----
-title: KrishiSetu AI Market Intelligence Service
-emoji: 🌾
-colorFrom: green
-colorTo: emerald
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # KrishiSetu AI Market Intelligence Service
 
 A Python/FastAPI microservice providing price prediction, forecasting, trend and

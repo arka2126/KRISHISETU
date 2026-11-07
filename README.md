@@ -41,7 +41,7 @@ flowchart TD
     end
 
     subgraph AILayer ["AI Intelligence Microservice (Python & FastAPI)"]
-        FastAPI["AI Service (Hugging Face Spaces / Docker)"]
+        FastAPI["AI Service (Python FastAPI Microservice)"]
         Predictor["Price Predictor (XGBoost / RandomForest)"]
         Forecaster["Time Series Forecaster (Holt-Winters)"]
         Anomaly["Anomaly Detector (Z-Score + Isolation Forest)"]
@@ -91,7 +91,7 @@ flowchart TD
 | **Database** | MongoDB Atlas, Mongoose ODM |
 | **AI / ML Service** | Python 3.11, FastAPI, Uvicorn, Scikit-Learn, XGBoost, Pandas, NumPy, Statsmodels |
 | **Authentication** | JWT (JSON Web Tokens), Bcrypt.js password hashing, Role-Based Access Control |
-| **Hosting & Cloud** | Vercel (Frontend), Render (Node Backend), Hugging Face Spaces (Python AI), MongoDB Atlas |
+| **Hosting & Cloud** | Vercel (Frontend), Render (Node Backend & Python AI Service), MongoDB Atlas |
 
 ---
 
@@ -125,8 +125,7 @@ krishisetu/
 │   │   ├── services/             # Market comparison & recommendation engine
 │   │   └── main.py               # FastAPI application endpoints
 │   ├── saved_models/             # Serialized .joblib and meta .json models
-│   ├── Dockerfile                # Production container for Hugging Face Spaces (Port 7860)
-│   ├── push-to-hf.sh             # One-click deploy script to Hugging Face Spaces
+│   ├── Procfile                  # Render deployment configuration (Port $PORT)
 │   ├── train_all.py              # CLI batch training script
 │   └── requirements.txt          # Python dependencies
 │
@@ -301,18 +300,20 @@ KrishiSetu is designed with a modern decoupled cloud architecture:
             │ Internal REST
             ▼
 ┌─────────────────────────┐
-│   Hugging Face Spaces   │ ◄── Python FastAPI AI Microservice (Docker)
-│  FastAPI + Scikit/XGB   │     (2 vCPU / 16 GB RAM Dedicated Free Tier)
+│     Render (Python)     │ ◄── Python FastAPI AI Microservice
+│  FastAPI + Scikit/XGB   │     (Pre-trained ML models + Uvicorn)
 └─────────────────────────┘
 ```
 
-### Deploying the AI Service (Hugging Face Spaces)
-The AI microservice can be packaged and deployed directly to Hugging Face Spaces with a single command using the included helper script:
-```bash
-cd ai-service
-./push-to-hf.sh <your-hf-username> [space-name]
-```
-> The script automatically builds and deploys the container. Hugging Face provides **16 GB RAM** for free, ensuring the 60+ machine learning models train and run without out-of-memory errors.
+### Deploying the AI Service (Render Web Service)
+The AI microservice can be deployed directly to Render as a free Python Web Service:
+1. In the Render Dashboard, create a **New Web Service** pointing to this repository.
+2. Configure settings:
+   - **Root Directory**: `ai-service`
+   - **Runtime**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Plan**: Free ($0/mo)
 
 ### Environment Variable Reference
 
@@ -329,12 +330,11 @@ MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net/krishisetu
 JWT_SECRET=your_production_jwt_secret
 JWT_EXPIRES_IN=7d
 CLIENT_URL=https://krishisetu-nine.vercel.app
-AI_SERVICE_URL=https://<your-hf-username>-krishisetu-ai.hf.space
+AI_SERVICE_URL=https://<your-ai-service-subdomain>.onrender.com
 ```
 
-#### AI Microservice (`Hugging Face Spaces / Docker`)
+#### AI Microservice (`Render`)
 ```env
-PORT=7860
 ALLOWED_ORIGINS=https://krishisetu-nine.vercel.app,https://krishisetu-on9g.onrender.com
 ```
 
